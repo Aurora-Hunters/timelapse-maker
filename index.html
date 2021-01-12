@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<link>
+  <meta charset="UTF-8">
+  <title>TimeLapse Maker</title>
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  <link href="public/main.css" rel="stylesheet">
+</head>
+<body>
+  <div id="version"></div>
+
+  <div class="table">
+    <div class="row">
+      <div class="cell">
+        <div class="header">TimeLapse Maker</div>
+      </div>
+    </div>
+
+    <div class="row mb-x">
+      <div class="cell cell--centered">
+        <div class="button select-directory" id="select-directory-button">Select Folder</div>
+      </div>
+      <div id="selected-directory" class="cell cell--centered cell--column hidden">
+        <div id="selected-directory-name" class="dirdata"></div>
+        <div id="selected-directory-images"></div>
+      </div>
+    </div>
+
+    <div id="tl-options" class="hidden">
+      <div class="row">
+        <div class="cell">
+          Frames per Second
+        </div>
+        <div class="cell cell--stretched">
+          <input type="text" id="inputFPS" value="30" class="short-number">
+        </div>
+      </div>
+
+<!--      <div class="row">-->
+<!--        <div class="cell">-->
+<!--          <h2>Output video params</h2>-->
+<!--        </div>-->
+<!--      </div>-->
+  <!--    <div class="row">-->
+  <!--      <div class="cell">-->
+  <!--        Output video FPS. How much images you want to see per second (outputFPS)-->
+  <!--      </div>-->
+  <!--      <div class="cell cell&#45;&#45;stretched">-->
+  <!--        <input type="text" id="outputFPS" value="30" class="short-number">-->
+  <!--      </div>-->
+  <!--    </div>-->
+      <div class="row">
+        <div class="cell">
+          Video resolution
+        </div>
+        <div class="cell cell--stretched">
+          <input type="text" id="videoWidth" value="?" class="short-number">
+          <span class="cross-separator">×</span>
+          <input type="text" id="videoHeight" value="2160" class="short-number">
+        </div>
+      </div>
+      <div class="row">
+        <div class="cell">
+          <span>Video filename</span>
+        </div>
+        <div class="cell cell--stretched">
+          <input type="text" id="timelapseName" value="timelapse">
+          <span class="ext-ending">.mp4</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="cell cell--centered mt-2x">
+          <div class="button" id="createTlButton">Create a timelapse</div>
+          <div class="button button--warning hidden" id="stopTlButton">Stop timelapse creation</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="cell">
+          <div id="progressbar" class="progressbar hidden">
+            <div id='progressbar__progress' class="progressbar__progress"></div>
+          </div>
+  <!--        <div id="previewImage" class="preview-image"></div>-->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const { version } = require('./package.json');
+    const path = require('path');
+    const fs = require('fs');
+    const open = require('open');
+    const FileToObject = require('./app/utils/file-to-object');
+
+    let images = [];
+
+    /**
+     * Global variable for ffmpeg command
+     */
+    let command;
+
+    const versionHolder = document.getElementById('version');
+
+    versionHolder.innerText = `v${version}`;
+
+    const selectDirectoryButton = document.getElementById('select-directory-button');
+    const selectedDirectory = document.getElementById('selected-directory');
+    const selectedDirectoryName = document.getElementById('selected-directory-name');
+    const selectedDirectoryImages = document.getElementById('selected-directory-images');
+
+    const inputFPS = document.getElementById('inputFPS');
+    const outputFPS = document.getElementById('outputFPS');
+    const videoWidth = document.getElementById('videoWidth');
+    const videoHeight = document.getElementById('videoHeight');
+    const timelapseName = document.getElementById('timelapseName');
+    const createTlButton = document.getElementById('createTlButton');
+    const stopTlButton = document.getElementById('stopTlButton');
+    const tlOptions = document.getElementById('tl-options');
+
+
+    const progressBar = document.getElementById('progressbar');
+    const progressBarProgress = document.getElementById('progressbar__progress');
+
+    // const previewImage = document.getElementById('previewImage');
+
+    const progressHit = function (percentage) {
+        const normalizedPercentage = percentage > 0 ? (percentage < 100 ? percentage : 100) : 0;
+
+        progressBarProgress.style.width = `${normalizedPercentage}%`;
+    };
+
+    /**
+     * Cached input element for preventing memory leak
+     * @type {HTMLInputElement}
+     */
+    let inputElement = null;
+
+    selectDirectoryButton.addEventListener('click', (event) => {
+      /**
+       * Check cached INPUT element
+       * If inputElement is null, create INPUT element cache
+       */
+      if (inputElement === null) {
+        /**
+         * Create a new INPUT element
+         * @type {HTMLElement}
+         */
+        inputElement = document.createElement('INPUT');
+
+        /**
+         * Set a 'FILE' type for this input element
+         * @type {string}
+         */
+        inputElement.type = 'file';
+
+        inputElement.webkitdirectory = true;
+
+        /**
+         * Do not show element
+         */
+        inputElement.style.display = 'none';
+
+        /**
+         * Append element to the body
+         * Fix using module on mobile devices
+         */
+        document.body.appendChild(inputElement);
+
+        /**
+         * Create event handler for resolving files
+         * @param {Event} event
+         */
+        const resolveFiles = async (event) => {
+          /**
+           * Get files from input field
+           */
+          const files = event.target.files;
+
+          /**
+           * Process selected files
+           */
+          await directorySelected([...files]);
+
+          /**
+           * Remove event handler for preventing memory leak
+           */
+          inputElement.removeEventListener('change', resolveFiles);
+
+          /**
+           * Remove element from a DOM
+           */
+          document.body.removeChild(inputElement);
+
+          /**
+           * Remove input element
+           */
+          inputElement = null;
+        };
+
+        /**
+         * Add onchange listener for «choose file» pop-up
+         */
+        inputElement.addEventListener('change', resolveFiles, false);
+      }
+
+      /**
+       * Fire click event on «input file» field
+       */
+      inputElement.click();
+    })
+
+    createTlButton.addEventListener('click', async (event) => {
+      createMovie({
+        images: images,
+        filename: timelapseName.value,
+        inputFPS: inputFPS.value,
+        resolution: {
+          width: videoWidth.value,
+          height: videoHeight.value
+        }
+      });
+    });
+
+    stopTlButton.addEventListener('click', async (event) => {
+      try {
+        command.kill();
+      } catch (e) {}
+    });
+
+    const directorySelected = async (chosenFiles) => {
+      let filesList = [];
+
+      console.log('chosenFiles', chosenFiles);
+
+      chosenFiles = chosenFiles.map((file, index) => {
+        return FileToObject(file);
+      });
+
+      filesList = chosenFiles
+        .filter(file => {
+          return (file.type).startsWith('image');
+        })
+        .sort(function (a, b) {
+          if (a.name < b.name) {
+            return -1;
+          }
+
+          if (a.name > b.name) {
+            return 1;
+          }
+
+          return 0;
+        })
+        .map(function (file) {
+          return file.path;
+        });
+
+      const dirname = path.basename(path.dirname(filesList[0]));
+      selectedDirectoryName.innerText = dirname;
+
+      images = filesList;
+
+      selectedDirectoryImages.innerText = `${images.length} images`;
+
+      selectedDirectory.classList.remove('hidden');
+
+      tlOptions.classList.remove('hidden');
+    };
+
+    const createMovie = async function (options) {
+      const defaultOptions = {
+        images: [],
+        filename: 'timelapse',
+        format: 'mp4',
+        inputFPS: 30,
+        outputFPS: 30,
+        resolution: {
+          width: '?',
+          height: 2160
+        }
+      };
+
+      options = Object.assign(defaultOptions, options);
+
+      if (inputFPS > 30) {
+        options.outputFPS = inputFPS
+      }
+
+      console.log('options', options);
+
+      if (options.images.length === 0) {
+        return;
+      }
+
+      const TEMPDIR_PATH = path.dirname(options.images[0]);
+      const FILE_SHOW = path.join(TEMPDIR_PATH, `${options.filename}.${options.format}`);
+      const LISTFILENAME = path.join(TEMPDIR_PATH, 'list.txt');
+
+      let list = '';
+      options.images.forEach(file => {
+          list += `file '${file}'\n`;
+      });
+
+      await fs.writeFileSync(LISTFILENAME, list);
+
+      const ffmpeg = require('fluent-ffmpeg')
+      const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+      const ffprobePath = require('@ffprobe-installer/ffprobe').path;
+
+      ffmpeg.setFfmpegPath(ffmpegPath.replace('app.asar', 'app.asar.unpacked'));
+      ffmpeg.setFfprobePath(ffprobePath.replace('app.asar', 'app.asar.unpacked'));
+
+      await new Promise((resolve, reject) => {
+        command = ffmpeg(LISTFILENAME)
+          .inputOptions([
+            '-f concat',
+            '-safe 0'
+          ])
+          .outputOption([
+            '-y',
+            '-pix_fmt yuv420p',
+            '-tune film', // https://trac.ffmpeg.org/wiki/Encode/H.264
+            // '-preset slow',
+            // '-crf 0'
+          ])
+          .inputFPS(options.inputFPS)
+          .size(`${options.resolution.width}x${options.resolution.height}`)
+          .fps(options.outputFPS)
+          .videoCodec(options.format === 'mp4' ? 'libx264' : '')
+          .toFormat(options.format)
+          .on('start', function(commandLine) {
+            console.log('Spawned Ffmpeg with command: ' + commandLine);
+
+            progressBar.classList.remove('hidden');
+            stopTlButton.classList.remove('hidden');
+            createTlButton.classList.add('hidden');
+          })
+          .on('progress', function(progress) {
+            const persentage = Math.round(progress.frames / (options.images.length * options.outputFPS / options.inputFPS) * 99);
+
+            // const frameNumber = Math.round(progress.frames / (options.outputFPS / options.inputFPS));
+            // previewImage.style.backgroundImage = `url('${options.images[frameNumber]}')`;
+
+            progressHit(persentage);
+            console.log('Processing: ' + persentage + '% done');
+          })
+          .on('end', async function(stdout, stderr) {
+            progressBar.classList.add('hidden');
+            stopTlButton.classList.add('hidden');
+            createTlButton.classList.remove('hidden');
+
+            console.log('Transcoding succeeded !');
+
+            try {
+              fs.unlinkSync(LISTFILENAME);
+            } catch (e) {}
+
+            await open(FILE_SHOW);
+
+            resolve(FILE_SHOW);
+          })
+          .on('error', function(err, stdout, stderr) {
+            progressBar.classList.add('hidden');
+            stopTlButton.classList.add('hidden');
+            createTlButton.classList.remove('hidden');
+
+            console.log('Cannot process video: ' + err.message);
+
+            reject(err);
+          })
+          .save(`${FILE_SHOW}`);
+      });
+
+      console.log('FILE_SHOW', FILE_SHOW);
+    };
+  </script>
+
+  <script src="public/bundle.js"></script>
+</body>
+</html>

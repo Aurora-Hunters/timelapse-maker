@@ -1,0 +1,78 @@
+/**
+ * Layout
+ */
+html, body {
+  height: 100%;
+  user-select: none;
+  margin: 0;
+}
+
+body {
+  color: #fff !important;
+  font-size: 16px;
+  font-family: 'Roboto Light';
+  -webkit-font-smoothing: antialiased;
+  background: linear-gradient(180deg, #0F0F26 0%, #0F0F26 71.14%, #09090A 113.83%);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.table {
+  margin: 0 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.cell {
+  width: 100px;
+  flex-grow: 1;
+  margin: 1px;
+  padding: 5px 10px;
+
+  &--centered {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  &--stretched {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &--column {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.m {
+  &t {
+    &-x {
+      margin-top: 8px;
+    }
+
+    &-2x {
+      margin-top: calc(8px * 2);
+    }
+  }
+
+  &b {
+    &-x {
+      margin-bottom: 8px;
+    }
+
+    &-2x {
+      margin-bottom: calc(8px * 2);
+    }
+  }
+}

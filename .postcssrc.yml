@@ -1,0 +1,12 @@
+plugins:
+  # Consumes files by @import rule
+  # https://github.com/postcss/postcss-import
+  postcss-import: {}
+
+  # Nested rules unwrapper
+  # https://github.com/postcss/postcss-nested
+  #
+  # As you know 'postcss-preset-env' plugin has an ability to process
+  # 'postcss-nesting' feature but it does not work with BEM
+  # Report: https://github.com/jonathantneal/postcss-nesting/issues/41
+  postcss-nested: {}

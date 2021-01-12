@@ -1,0 +1,122 @@
+@import "fonts.pcss";
+@import "layout.pcss";
+
+
+/**
+ * Elements
+ */
+.button {
+  padding: 6px 20px;
+  display: inline-block;
+  border-radius: 10px;
+  background-color: #4545A5;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: #353584;
+  }
+
+  &:active {
+   background-color: #232358;
+  }
+
+  &--warning {
+    background-color: #910f0f;
+
+    &:hover {
+      background-color: #720b0b;
+    }
+
+    &:active {
+      background-color: #4f0808;
+    }
+  }
+}
+
+
+.header {
+  font-family: 'Roboto Thin';
+  font-size: 36px;
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 26px;
+}
+
+
+.hidden {
+  display: none !important;
+}
+
+
+.short-number {
+  width: 50px;
+}
+
+.disabled {
+  background-color: #333;
+}
+
+
+input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
+  background-color: #515B7D;
+  border: none;
+  border-radius: 4px;
+  color: #DEDEDE;
+  text-align: center;
+  padding: 4px;
+  font-size: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+
+
+
+.progressbar {
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+}
+
+.progressbar__progress {
+  width: 0;
+  height: 100%;
+  background: #189ecc;
+  border-radius: 4px;
+}
+
+
+.preview-image {
+  height: 400px;
+  background-position: 50%;
+  background-size: cover;
+}
+
+.cross-separator {
+  margin: 0 5px;
+}
+
+.ext-ending {
+  margin-left: 2px;
+}
+
+.dirdata {
+  margin: 2px auto;
+}
+
+#version {
+  position: absolute;
+  top: 2px;
+  right: 5px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.2);
+}
