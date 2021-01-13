@@ -238,6 +238,8 @@
         return FileToObject(file);
       });
 
+      let shortestDirname = false;
+
       filesList = chosenFiles
         .filter(file => {
           return (file.type).startsWith('image');
@@ -254,18 +256,28 @@
           return 0;
         })
         .map(function (file) {
+          const dirname = path.dirname(file.path);
+
+          if (!shortestDirname || dirname.length < shortestDirname.length) {
+            shortestDirname = dirname;
+          }
+
           return file.path;
         });
-
-      const dirname = path.basename(path.dirname(filesList[0]));
-      selectedDirectoryName.innerText = dirname;
+        // .filter(filepath => {
+        //   const dirname = path.dirname(filepath);
+        //
+        //   return dirname === shortestDirname;
+        // });
 
       images = filesList;
 
       selectedDirectoryImages.innerText = `${images.length} images`;
 
-      selectedDirectory.classList.remove('hidden');
+      const dirname = path.basename(shortestDirname);
+      selectedDirectoryName.innerText = dirname;
 
+      selectedDirectory.classList.remove('hidden');
       tlOptions.classList.remove('hidden');
     };
 
