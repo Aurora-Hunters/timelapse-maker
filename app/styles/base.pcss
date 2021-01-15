@@ -34,6 +34,11 @@
   }
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 
 .header {
   font-family: 'Roboto Thin';
@@ -118,5 +123,15 @@ button:focus {
   top: 2px;
   right: 5px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+  }
+
+  &:active {
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+  }
 }

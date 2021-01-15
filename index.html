@@ -104,6 +104,9 @@
     const versionHolder = document.getElementById('version');
 
     versionHolder.innerText = `v${version}`;
+    versionHolder.addEventListener('click', async () => {
+      await open(`https://github.com/Aurora-Hunters/timelapse-maker/releases/tag/v${version}`);
+    });
 
     const selectDirectoryButton = document.getElementById('select-directory-button');
     const selectedDirectory = document.getElementById('selected-directory');
