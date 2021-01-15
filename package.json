@@ -1,7 +1,7 @@
 {
   "name": "tlmaker",
   "productName": "TimeLapse Maker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Create amazing videos from separate images",
   "main": "index.js",
   "scripts": {
