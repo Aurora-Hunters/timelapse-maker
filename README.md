@@ -1,10 +1,16 @@
+[mac]: https://github.com/Aurora-Hunters/timelapse-maker/releases/download/v0.0.2/TimeLapse-Maker-0.0.2.dmg
+[win]: https://github.com/Aurora-Hunters/timelapse-maker/releases/download/v0.0.2/TimeLapse-Maker-Setup-0.0.2.exe
+[lin]: https://github.com/Aurora-Hunters/timelapse-maker/releases/download/v0.0.2/TimeLapse-Maker-0.0.2.AppImage
+
 # TimeLapse Maker
 
 Simple app for time-lapse assembling. Choose a directory with photos, set FPS and resolution and get a video.  
 
-Available on macOS, Windows and Linux.
+Available on [macOS](mac), [Windows](win) and [Linux](lin).
 
 ![](./docs/assets/demo.png)
+
+Releases and changes [page](https://github.com/Aurora-Hunters/timelapse-maker/releases/latest).
 
 ## Issues and improvements
 
