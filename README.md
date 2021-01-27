@@ -6,7 +6,7 @@
 
 Simple app for time-lapse assembling. Choose a directory with photos, set FPS and resolution and get a video.  
 
-Available on [macOS](mac), [Windows](win) and [Linux](lin).
+Available on [macOS][mac], [Windows][win] and [Linux][lin].
 
 ![](./docs/assets/demo.png)
 
