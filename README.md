@@ -8,9 +8,13 @@ Simple application for assembling time lapses. Choose a directory with photos, s
 
 Available on [macOS][mac], [Windows][win] and [Linux][lin].
 
-![](./docs/assets/demo.gif)
+![](./docs/assets/demo.png)
 
 Releases and changes [page](https://github.com/Aurora-Hunters/timelapse-maker/releases/latest).
+
+## Demo
+
+![](./docs/assets/demo.gif)
 
 ## Issues and improvements
 
