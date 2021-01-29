@@ -1,7 +1,7 @@
 {
   "name": "tlmaker",
-  "productName": "TimeLapse Maker",
-  "version": "0.0.2",
+  "productName": "Time Lapse Maker",
+  "version": "0.0.3",
   "description": "Create amazing videos from separate images",
   "main": "index.js",
   "scripts": {
@@ -42,6 +42,7 @@
   },
   "build": {
     "appId": "ru.auroralights.timelapse-maker",
+    "artifactName": "${productName}.${ext}",
     "dmg": {
       "background": "build/dmg/background.png",
       "iconSize": 128,

@@ -5,7 +5,7 @@ const IS_DEV = require('electron-is-dev');
 
 async function createWindow () {
   const windowOptions = {
-    width: 400,
+    width: IS_DEV ? 956 : 400,
     height: 420,
     webPreferences: {
       nodeIntegration: true
