@@ -6,7 +6,7 @@
 
 Simple application for assembling time lapses. Choose a directory with photos, set FPS and resolution and get a video.  
 
-[<img src="docs/assets/mac.png" height="40px">][mac] [<img src="docs/assets/win.png" height="40px">][win] [<img src="docs/assets/linux.png" height="40px">][linux]
+[<img src="docs/assets/mac.png" height="40px">][mac] <img src="docs/assets/space"> [<img src="docs/assets/win.png" height="40px">][win] <img src="docs/assets/space"> [<img src="docs/assets/linux.png" height="40px">][linux]
 
 ![](./docs/assets/demo.png)
 
