@@ -51,6 +51,12 @@
       <div class="row">
         <div class="cell">
           Video resolution
+          <br>
+          <span class="video-resolution" onclick="updateResolution('', '')">Source</span>
+          <span class="video-resolution" onclick="updateResolution('?', '720')">HD</span>
+          <span class="video-resolution" onclick="updateResolution('?', '1080')">Full HD</span>
+          <span class="video-resolution" onclick="updateResolution('?', '2160')">4K</span>
+          <span class="video-resolution" onclick="updateResolution('?', '4320')">8K</span>
         </div>
         <div class="cell cell--stretched">
           <input type="text" id="videoWidth" value="?" class="short-number">
@@ -92,13 +98,23 @@
     const fs = require('fs');
     const open = require('open');
     const FileToObject = require('./app/utils/file-to-object');
+    const sizeOf = require('image-size');
 
+    /**
+     * Global variable
+     * List of images
+     */
     let images = [];
 
     /**
      * Global variable for ffmpeg command
      */
     let command;
+
+    const sourceResolution = {
+      width: 0,
+      height: 0
+    }
 
     const versionHolder = document.getElementById('version');
 
@@ -214,6 +230,8 @@
     })
 
     createTlButton.addEventListener('click', async (event) => {
+      checkSelectedImages();
+
       createMovie({
         images: images,
         filename: timelapseName.value,
@@ -230,6 +248,16 @@
         command.kill();
       } catch (e) {}
     });
+
+    const updateResolution = (width = '?', height = '?') => {
+      if (!width && !height) {
+        width = sourceResolution.width;
+        height = sourceResolution.height;
+      }
+
+      videoWidth.value = width;
+      videoHeight.value = height;
+    }
 
     const directorySelected = async (chosenFiles) => {
       let filesList = [];
@@ -276,12 +304,35 @@
 
       selectedDirectoryImages.innerText = `${images.length} images`;
 
+      selectedDirectoryImages.addEventListener('click', checkSelectedImages)
+
+      const dimensions = sizeOf(images[0]);
+      sourceResolution.width = dimensions.width;
+      sourceResolution.height = dimensions.height;
+      updateResolution(sourceResolution.width, sourceResolution.height);
+
       const dirname = path.basename(shortestDirname);
       selectedDirectoryName.innerText = dirname;
 
       selectedDirectory.classList.remove('hidden');
       tlOptions.classList.remove('hidden');
     };
+
+    const checkSelectedImages = () => {
+      images = images.filter(image => {
+        try {
+          if (fs.existsSync(image)) {
+            return true;
+          }
+        } catch(err) {
+          console.error(err)
+        }
+
+        return false;
+      })
+
+      selectedDirectoryImages.innerText = `${images.length} images`;
+    }
 
     const createMovie = async function (options) {
       const defaultOptions = {
@@ -314,7 +365,9 @@
 
       let list = '';
       options.images.forEach(file => {
-          list += `file '${file}'\n`;
+        if (!fs.existsSync(file)) return;
+
+        list += `file '${file}'\n`;
       });
 
       await fs.writeFileSync(LISTFILENAME, list);

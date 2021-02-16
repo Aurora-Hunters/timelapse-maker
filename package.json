@@ -1,7 +1,7 @@
 {
   "name": "tlmaker",
   "productName": "Time Lapse Maker",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Create amazing videos from separate images",
   "main": "index.js",
   "scripts": {
@@ -36,6 +36,7 @@
     "electron-is-dev": "^1.2.0",
     "electron-updater": "^4.3.5",
     "fluent-ffmpeg": "^2.1.2",
+    "image-size": "^0.9.3",
     "open": "^7.3.1",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"
