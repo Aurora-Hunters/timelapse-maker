@@ -5,8 +5,8 @@ const IS_DEV = require('electron-is-dev');
 
 async function createWindow () {
   const windowOptions = {
-    width: IS_DEV ? 956 : 400,
-    height: 420,
+    width: IS_DEV ? 956 : 420,
+    height: 430,
     webPreferences: {
       nodeIntegration: true
     },
@@ -15,44 +15,45 @@ async function createWindow () {
 
   const win = new BrowserWindow(windowOptions)
 
-  const menuBar = Menu.buildFromTemplate([{
-      label: app.getName(),
-      submenu: [
-        {
-          label: 'About ' + app.getName(),
-          role: 'about'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'Hide ' + app.getName(),
-          accelerator: 'Command+H',
-          role: 'hide'
-        },
-        {
-          label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
-          role: 'hideothers'
-        },
-        {
-          label: 'Show All',
-          role: 'unhide'
-        },
-        {
-          type: 'separator'
-        }, {
-          label: 'Quit',
-          accelerator: 'CmdOrCtrl+Q',
-          click: function () {
-            app.quit();
-          }
-        }
-      ],
-    }]
-  );
-
-  Menu.setApplicationMenu(menuBar);
+  // const menuBar = Menu.buildFromTemplate([{
+  //     label: app.getName(),
+  //     submenu: [
+  //       {
+  //         label: 'About ' + app.getName(),
+  //         role: 'about'
+  //       },
+  //       {
+  //         type: 'separator'
+  //       },
+  //       {
+  //         label: 'Hide ' + app.getName(),
+  //         accelerator: 'Command+H',
+  //         role: 'hide'
+  //       },
+  //       {
+  //         label: 'Hide Others',
+  //         accelerator: 'Command+Shift+H',
+  //         role: 'hideothers'
+  //       },
+  //       {
+  //         label: 'Show All',
+  //         role: 'unhide'
+  //       },
+  //       {
+  //         type: 'separator'
+  //       }, {
+  //         label: 'Quit',
+  //         accelerator: 'CmdOrCtrl+Q',
+  //         click: function () {
+  //           app.quit();
+  //         }
+  //       }
+  //     ],
+  //   }]
+  // );
+  //
+  // Menu.setApplicationMenu(menuBar);
+  win.setMenu(null);
 
   win.loadFile('index.html');
 
