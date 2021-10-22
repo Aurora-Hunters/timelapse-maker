@@ -6,13 +6,8 @@ on:
       - '*'
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-
+  send-release-data:
+    runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v1
@@ -31,6 +26,22 @@ jobs:
         with:
           release: ${{ steps.packageInfo.outputs.name }}-${{ steps.packageInfo.outputs.version }}
           token: ${{ secrets.HAWK_TOKEN }}
+
+  create-release-draft:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 15
 
       - name: Make envfile with Hawk token
         uses: ozaytsev86/create-env-file@v1
