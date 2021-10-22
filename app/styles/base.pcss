@@ -75,6 +75,10 @@ input[type="text"] {
   text-align: center;
   padding: 4px;
   font-size: inherit;
+
+  &::placeholder {
+    color: rgba(222, 222, 222, 0.5);
+  }
 }
 
 input:focus,
@@ -119,6 +123,24 @@ button:focus {
 }
 
 #version {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+  }
+
+  &:active {
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+  }
+}
+
+#help {
   position: absolute;
   top: 2px;
   right: 5px;

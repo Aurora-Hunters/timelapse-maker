@@ -7,6 +7,7 @@
 </head>
 <body>
   <div id="version"></div>
+<!--  <div id="help"></div>-->
 
   <div class="table">
     <div class="row">
@@ -31,7 +32,7 @@
           Frames per Second
         </div>
         <div class="cell cell--stretched">
-          <input type="text" id="inputFPS" value="30" class="short-number">
+          <input type="text" id="inputFPS" value="24" class="short-number">
         </div>
       </div>
 
@@ -52,16 +53,16 @@
         <div class="cell">
           Video resolution
           <br>
-          <span class="video-resolution" onclick="updateResolution('', '')">Source</span>
-          <span class="video-resolution" onclick="updateResolution('?', '720')">HD</span>
-          <span class="video-resolution" onclick="updateResolution('?', '1080')">Full HD</span>
-          <span class="video-resolution" onclick="updateResolution('?', '2160')">4K</span>
-          <span class="video-resolution" onclick="updateResolution('?', '4320')">8K</span>
+          <span class="video-resolution" onclick="updateResolution('', '')" title="The highest available resolution">Source</span>
+          <span class="video-resolution" onclick="updateResolution('', '720')" title="Small video for social networks">HD</span>
+          <span class="video-resolution" onclick="updateResolution('', '1080')" title="The most common quality video size">Full HD</span>
+          <span class="video-resolution" onclick="updateResolution('', '2160')" title="High quality video for Youtube">4K</span>
+<!--          <span class="video-resolution" onclick="updateResolution('', '4320')">8K</span>-->
         </div>
         <div class="cell cell--stretched">
-          <input type="text" id="videoWidth" value="?" class="short-number">
+          <input type="text" id="videoWidth" value="" placeholder="auto" class="short-number">
           <span class="cross-separator">×</span>
-          <input type="text" id="videoHeight" value="2160" class="short-number">
+          <input type="text" id="videoHeight" value="1080" placeholder="auto" class="short-number">
         </div>
       </div>
       <div class="row">
@@ -76,8 +77,8 @@
 
       <div class="row">
         <div class="cell cell--centered mt-2x">
-          <div class="button" id="createTlButton">Create a timelapse</div>
-          <div class="button button--warning hidden" id="stopTlButton">Stop timelapse creation</div>
+          <div class="button" id="createTlButton">Create video</div>
+          <div class="button button--warning hidden" id="stopTlButton">Stop video creation</div>
         </div>
       </div>
       <div class="row">
@@ -93,7 +94,6 @@
   </div>
 
   <script>
-    const { version } = require('./package.json');
     const path = require('path');
     const fs = require('fs');
     const open = require('open');
@@ -116,12 +116,18 @@
       height: 0
     }
 
+    const { version } = require('./package.json');
     const versionHolder = document.getElementById('version');
-
     versionHolder.innerText = `v${version}`;
     versionHolder.addEventListener('click', async () => {
       await open(`https://github.com/Aurora-Hunters/timelapse-maker/releases/tag/v${version}`);
     });
+
+    // const helpHolder = document.getElementById('help');
+    // helpHolder.innerText = `Help`;
+    // helpHolder.addEventListener('click', async () => {
+    //   await open(`https://github.com/Aurora-Hunters/timelapse-maker/blob/master/docs/help.md`);
+    // });
 
     const selectDirectoryButton = document.getElementById('select-directory-button');
     const selectedDirectory = document.getElementById('selected-directory');
@@ -309,7 +315,7 @@
       const dimensions = sizeOf(images[0]);
       sourceResolution.width = dimensions.width;
       sourceResolution.height = dimensions.height;
-      updateResolution(sourceResolution.width, sourceResolution.height);
+      // updateResolution(sourceResolution.width, sourceResolution.height);
 
       const dirname = path.basename(shortestDirname);
       selectedDirectoryName.innerText = dirname;
@@ -337,17 +343,25 @@
     const createMovie = async function (options) {
       const defaultOptions = {
         images: [],
-        filename: 'timelapse',
+        filename: `timelapse`,
         format: 'mp4',
-        inputFPS: 30,
+        inputFPS: 24,
         outputFPS: 30,
         resolution: {
           width: '?',
-          height: 2160
+          height: '?'
         }
       };
 
       options = Object.assign(defaultOptions, options);
+
+      if (options.resolution.width === '') {
+        options.resolution.width = '?';
+      }
+
+      if (options.resolution.height === '') {
+        options.resolution.height = '?';
+      }
 
       if (inputFPS > 30) {
         options.outputFPS = inputFPS
@@ -383,17 +397,22 @@
         command = ffmpeg(LISTFILENAME)
           .inputOptions([
             '-f concat',
-            '-safe 0'
+            '-safe 0',
+          ])
+          .size(`${options.resolution.width}x${options.resolution.height}`)
+          .videoFilter([
+            {
+              filter: 'deflicker',
+              options: {
+                size: 7
+              }
+            }
           ])
           .outputOption([
             '-y',
             '-pix_fmt yuv420p',
-            '-tune film', // https://trac.ffmpeg.org/wiki/Encode/H.264
-            // '-preset slow',
-            // '-crf 0'
           ])
           .inputFPS(options.inputFPS)
-          .size(`${options.resolution.width}x${options.resolution.height}`)
           .fps(options.outputFPS)
           .videoCodec(options.format === 'mp4' ? 'libx264' : '')
           .toFormat(options.format)
