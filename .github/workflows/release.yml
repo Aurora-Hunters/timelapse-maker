@@ -22,6 +22,22 @@ jobs:
         with:
           node-version: 15
 
+      - name: Get package info
+        id: packageInfo
+        uses: codex-team/action-nodejs-package-info@v1
+
+      - name: Send release data
+        uses: codex-team/hawk.releases@v1
+        with:
+          release: ${{ steps.packageInfo.outputs.name }}-${{ steps.packageInfo.outputs.version }}
+          token: ${{ secrets.HAWK_TOKEN }}
+
+      - name: Make envfile with Hawk token
+        uses: ozaytsev86/create-env-file@v1
+        with:
+          file-name: './.env'
+          ENV_HAWK_TOKEN: ${{ secrets.HAWK_TOKEN }}
+
       - name: Build and release
         uses: samuelmeuli/action-electron-builder@v1
         with:

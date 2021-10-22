@@ -6,8 +6,50 @@
   <link href="public/main.css" rel="stylesheet">
 </head>
 <body>
+  <script>
+    require('dotenv').config();
+  </script>
+
   <div id="version"></div>
-<!--  <div id="help"></div>-->
+
+  <script>
+    const { version } = require('./package.json');
+    const versionHolder = document.getElementById('version');
+
+    versionHolder.innerText = `v${version}`;
+    versionHolder.addEventListener('click', async () => {
+      await open(`https://github.com/Aurora-Hunters/timelapse-maker/releases/tag/v${version}`);
+    });
+  </script>
+
+  <script>
+    const hawkToken = process.env.HAWK_TOKEN;
+
+    if (hawkToken) {
+      const machineIdSync = require('node-machine-id').machineIdSync;
+
+      const HawkCatcher = require('@hawk.so/javascript');
+      const hawk = new HawkCatcher({
+        token: hawkToken,
+        release: `v${version}`,
+        user: {
+          id: machineIdSync({original: true})
+        },
+        beforeSend: (event) => {
+          console.log(event);
+
+          event.context = {
+            params: 'test'
+          }
+
+          return event;
+        }
+      });
+
+      hawk.test();
+    }
+  </script>
+  <!--  <div id="help"></div>-->
 
   <div class="table">
     <div class="row">
@@ -115,13 +157,6 @@
       width: 0,
       height: 0
     }
-
-    const { version } = require('./package.json');
-    const versionHolder = document.getElementById('version');
-    versionHolder.innerText = `v${version}`;
-    versionHolder.addEventListener('click', async () => {
-      await open(`https://github.com/Aurora-Hunters/timelapse-maker/releases/tag/v${version}`);
-    });
 
     // const helpHolder = document.getElementById('help');
     // helpHolder.innerText = `Help`;
@@ -348,8 +383,8 @@
         inputFPS: 24,
         outputFPS: 30,
         resolution: {
-          width: '?',
-          height: '?'
+          width: '',
+          height: ''
         }
       };
 
@@ -393,6 +428,8 @@
       ffmpeg.setFfmpegPath(ffmpegPath.replace('app.asar', 'app.asar.unpacked'));
       ffmpeg.setFfprobePath(ffprobePath.replace('app.asar', 'app.asar.unpacked'));
 
+      progressHit(0);
+
       await new Promise((resolve, reject) => {
         command = ffmpeg(LISTFILENAME)
           .inputOptions([
@@ -424,13 +461,13 @@
             createTlButton.classList.add('hidden');
           })
           .on('progress', function(progress) {
-            const persentage = Math.round(progress.frames / (options.images.length * options.outputFPS / options.inputFPS) * 99);
+            const percentage = Math.round(progress.frames / (options.images.length * options.outputFPS / options.inputFPS) * 99);
 
             // const frameNumber = Math.round(progress.frames / (options.outputFPS / options.inputFPS));
             // previewImage.style.backgroundImage = `url('${options.images[frameNumber]}')`;
 
-            progressHit(persentage);
-            console.log('Processing: ' + persentage + '% done');
+            progressHit(percentage);
+            console.log('Processing: ' + percentage + '% done');
           })
           .on('end', async function(stdout, stderr) {
             progressBar.classList.add('hidden');
