@@ -6,10 +6,6 @@
   <link href="public/main.css" rel="stylesheet">
 </head>
 <body>
-  <script>
-    require('dotenv').config();
-  </script>
-
   <div id="version"></div>
 
   <script>
@@ -23,11 +19,12 @@
   </script>
 
   <script>
-    const hawkToken = process.env.HAWK_TOKEN;
+    const { hawkToken } = require('./env.json');
+
+    window.tlOptions = {};
 
     if (hawkToken) {
       const machineIdSync = require('node-machine-id').machineIdSync;
-
       const HawkCatcher = require('@hawk.so/javascript');
       const hawk = new HawkCatcher({
         token: hawkToken,
@@ -39,7 +36,7 @@
           console.log(event);
 
           event.context = {
-            params: 'test'
+            options: window.tlOptions
           }
 
           return event;
@@ -429,6 +426,8 @@
       ffmpeg.setFfprobePath(ffprobePath.replace('app.asar', 'app.asar.unpacked'));
 
       progressHit(0);
+
+      window.tlOptions = options;
 
       await new Promise((resolve, reject) => {
         command = ffmpeg(LISTFILENAME)

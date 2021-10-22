@@ -10,7 +10,8 @@
     "front:prebuild": "rimraf ./public",
     "front:build": "yarn front:prebuild && webpack --mode production",
     "front:build:watch": "yarn front:prebuild && webpack --mode production --watch",
-    "electron:prebuild": "yarn electron:icons-gen && yarn front:build",
+    "env-gen": "node ./bin/env-gen.js",
+    "electron:prebuild": "yarn electron:icons-gen && yarn front:build && yarn env-gen",
     "electron:build": "electron-builder",
     "electron:icons-gen": "electron-icon-builder --input=./app/icons/app-icon.png --output=build --flatten && yarn electron:icons-gen:postrun",
     "electron:icons-gen:postrun": "cp ./build/icons/icon.ico ./build && cp ./build/icons/icon.icns ./build && cp ./build/icons/1024x1024.png ./build/icon.png && rimraf ./build/icons"
