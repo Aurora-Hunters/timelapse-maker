@@ -342,6 +342,7 @@
 
       selectedDirectoryImages.addEventListener('click', checkSelectedImages)
 
+      images = images.filter(item => !item.includes('/._'))
       const dimensions = sizeOf(images[0]);
       sourceResolution.width = dimensions.width;
       sourceResolution.height = dimensions.height;
@@ -418,10 +419,10 @@
 
       const ffmpeg = require('fluent-ffmpeg')
       const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-      const ffprobePath = require('@ffprobe-installer/ffprobe').path;
+      // const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 
       ffmpeg.setFfmpegPath(ffmpegPath.replace('app.asar', 'app.asar.unpacked'));
-      ffmpeg.setFfprobePath(ffprobePath.replace('app.asar', 'app.asar.unpacked'));
+      // ffmpeg.setFfprobePath(ffprobePath.replace('app.asar', 'app.asar.unpacked'));
 
       progressHit(0);
 
